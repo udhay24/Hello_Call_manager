@@ -1,0 +1,48 @@
+{
+  "project_info": {
+    "project_number": "113525944035",
+    "firebase_url": "https://call-manager-4a4e1.firebaseio.com",
+    "project_id": "call-manager-4a4e1",
+    "storage_bucket": "call-manager-4a4e1.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:113525944035:android:1aa4c4e6a2733aef3d1fd6",
+        "android_client_info": {
+          "package_name": "com.udhay.callmanager"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "113525944035-6069mu0i792lgeq1aoll4j3o502vcc1u.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.udhay.callmanager",
+            "certificate_hash": "95b99a5d4373759af485e9f11d15b346e35d2d9a"
+          }
+        },
+        {
+          "client_id": "113525944035-g6bukvf6fv4ea77dj1iipfb181aol19c.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDnqJd7i_YR828yL2UTfrlf1b0T76s2GXY"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "113525944035-g6bukvf6fv4ea77dj1iipfb181aol19c.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
