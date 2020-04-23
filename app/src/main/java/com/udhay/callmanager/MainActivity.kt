@@ -6,15 +6,27 @@ import android.hardware.SensorEvent
 import android.hardware.SensorEventListener
 import android.hardware.SensorManager
 import android.os.Bundle
+import android.os.CountDownTimer
 import android.util.Log
+import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
+import com.google.firebase.firestore.ktx.firestore
+import com.google.firebase.ktx.Firebase
 import kotlinx.android.synthetic.main.activity_main.*
 
 class MainActivity : AppCompatActivity(), SensorEventListener {
 
     private val accelerometerValue: MutableList<FloatArray> = mutableListOf()
+    private val gyroscopeData: MutableList<FloatArray> = mutableListOf()
+    private val proximityData: MutableList<Double> = mutableListOf()
+
     private lateinit var sensorManager: SensorManager
     private lateinit var accelerometer: Sensor
+    private lateinit var proximitySensor: Sensor
+    private lateinit var gyroscopeSensor: Sensor
+
+    val db = Firebase.firestore
+
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -22,6 +34,8 @@ class MainActivity : AppCompatActivity(), SensorEventListener {
 
         sensorManager = getSystemService(Context.SENSOR_SERVICE) as SensorManager
         accelerometer = sensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER)
+        proximitySensor = sensorManager.getDefaultSensor(Sensor.TYPE_PROXIMITY)
+        gyroscopeSensor = sensorManager.getDefaultSensor(Sensor.TYPE_GYROSCOPE)
 
         start_button.setOnClickListener {
             startRecording()
@@ -41,20 +55,59 @@ class MainActivity : AppCompatActivity(), SensorEventListener {
             Sensor.TYPE_ACCELEROMETER -> {
                 accelerometerValue.add(event.values)
             }
+
+            Sensor.TYPE_PROXIMITY -> {
+                proximityData.add(event.values[0].toDouble())
+            }
+
+            Sensor.TYPE_GYROSCOPE -> {
+                gyroscopeData.add(event.values)
+            }
         }
     }
 
     private fun startRecording() {
+        Toast.makeText(this, "Started", Toast.LENGTH_SHORT).show()
         sensorManager.registerListener(this, accelerometer, SensorManager.SENSOR_DELAY_FASTEST)
+        sensorManager.registerListener(this, proximitySensor, SensorManager.SENSOR_DELAY_FASTEST)
+        sensorManager.registerListener(this, gyroscopeSensor, SensorManager.SENSOR_DELAY_FASTEST)
+
+        object: CountDownTimer(3000, 1000) {
+            override fun onFinish() {
+                stopRecording()
+            }
+
+            override fun onTick(millisUntilFinished: Long) {
+
+            }
+        }.start()
     }
 
     private fun stopRecording() {
         sensorManager.unregisterListener(this)
         publishToFirestore()
+        Toast.makeText(this, "Stopped", Toast.LENGTH_SHORT).show()
     }
 
     fun publishToFirestore() {
-        Log.v("Accelerometer", accelerometerValue.joinToString { "${it.joinToString(",")} / " })
-        accelerometerValue.clear()
+        db.collection("accelerometer")
+            .add("data" to accelerometerValue.joinToString { "${it.joinToString(",")} / " })
+            .addOnCompleteListener {
+                accelerometerValue.clear()
+            }
+
+        db.collection("gyroscope")
+            .add("data" to gyroscopeData.joinToString { "${it.joinToString(",")} / " })
+            .addOnCompleteListener {
+                accelerometerValue.clear()
+            }
+
+        db.collection("proximitySensor")
+            .add("data" to proximityData.joinToString { "$it / " })
+            .addOnCompleteListener {
+                accelerometerValue.clear()
+            }
+
+
     }
 }
