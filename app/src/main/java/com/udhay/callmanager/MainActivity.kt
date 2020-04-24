@@ -102,7 +102,7 @@ class MainActivity : AppCompatActivity(), SensorEventListener {
                 accelerometerValue.clear()
             }
 
-        db.collection("proximitySensor")
+        db.collection("proximity")
             .add("data" to proximityData.joinToString { "$it / " })
             .addOnCompleteListener {
                 accelerometerValue.clear()
