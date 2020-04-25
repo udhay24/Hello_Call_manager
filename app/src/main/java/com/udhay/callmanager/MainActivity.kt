@@ -16,8 +16,8 @@ import kotlinx.android.synthetic.main.activity_main.*
 
 class MainActivity : AppCompatActivity(), SensorEventListener {
 
-    private val accelerometerValue: MutableList<FloatArray> = mutableListOf()
-    private val gyroscopeData: MutableList<FloatArray> = mutableListOf()
+    private val accelerometerData: MutableList<Array<Float>> = mutableListOf()
+    private val gyroscopeData: MutableList<Array<Float>> = mutableListOf()
     private val proximityData: MutableList<Double> = mutableListOf()
 
     private lateinit var sensorManager: SensorManager
@@ -53,21 +53,33 @@ class MainActivity : AppCompatActivity(), SensorEventListener {
     override fun onSensorChanged(event: SensorEvent?) {
         when (event?.sensor?.type) {
             Sensor.TYPE_ACCELEROMETER -> {
-                accelerometerValue.add(event.values)
+                accelorometer_text_view.text = event.values.joinToString(",")
+
+                accelerometerData.add(
+                    arrayOf(event.values[0], event.values[1], event.values[2])
+                )
             }
 
             Sensor.TYPE_PROXIMITY -> {
+                proximity_text_view.text = event.values.joinToString(",")
                 proximityData.add(event.values[0].toDouble())
             }
 
             Sensor.TYPE_GYROSCOPE -> {
-                gyroscopeData.add(event.values)
+                gyroscope_text_view.text = event.values.joinToString(",")
+                gyroscopeData.add(
+                    arrayOf(event.values[0], event.values[1], event.values[2])
+                )
             }
         }
     }
 
     private fun startRecording() {
         Toast.makeText(this, "Started", Toast.LENGTH_SHORT).show()
+        accelerometerData.clear()
+        gyroscopeData.clear()
+        proximityData.clear()
+
         sensorManager.registerListener(this, accelerometer, SensorManager.SENSOR_DELAY_FASTEST)
         sensorManager.registerListener(this, proximitySensor, SensorManager.SENSOR_DELAY_FASTEST)
         sensorManager.registerListener(this, gyroscopeSensor, SensorManager.SENSOR_DELAY_FASTEST)
@@ -91,23 +103,21 @@ class MainActivity : AppCompatActivity(), SensorEventListener {
 
     fun publishToFirestore() {
         db.collection("accelerometer")
-            .add("data" to accelerometerValue.joinToString { "${it.joinToString(",")} / " })
+            .add("data" to accelerometerData.joinToString { "${it.joinToString(",")} / " })
             .addOnCompleteListener {
-                accelerometerValue.clear()
+                accelerometerData.clear()
             }
 
         db.collection("gyroscope")
             .add("data" to gyroscopeData.joinToString { "${it.joinToString(",")} / " })
             .addOnCompleteListener {
-                accelerometerValue.clear()
+                gyroscopeData.clear()
             }
 
         db.collection("proximity")
             .add("data" to proximityData.joinToString { "$it / " })
             .addOnCompleteListener {
-                accelerometerValue.clear()
+                gyroscopeData.clear()
             }
-
-
     }
 }
